@@ -56,11 +56,13 @@ public class Analysis extends WearableActivity {
     boolean reset = true;
     boolean trigger = false;
     boolean trigger2 = false;
+    boolean busStop = false;
     int iteration = 0;
     int printIteration;
-    String output;
+    String output = "";
     public Button button;
     public Button button2;
+    float [] values = new float[10];
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;
     @Override
@@ -101,7 +103,7 @@ public class Analysis extends WearableActivity {
 
         button2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("hh_mm_ss");
+                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy_MM_dd G 'at' hh_mm_ss");
                 // Perform action on click
 //               writeToFile(output);
                 File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/LocationData", "text");
@@ -118,7 +120,25 @@ public class Analysis extends WearableActivity {
                     writer.close();
                     Toast.makeText(Analysis.this, "Saved your text", Toast.LENGTH_LONG).show();
                 } catch (Exception e) { }
+                output = "";
 
+            }
+
+        });
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                busStop = true;
+                if(busStop)
+                {
+//                    Toast.makeText(Analysis.this, "Bus Stop Declared", Toast.LENGTH_LONG).show();
+                    SimpleDateFormat simpleDateFormat3 = new SimpleDateFormat("HH:mm:ss");
+                    Toast.makeText(Analysis.this, "Bus Stop Declared" +simpleDateFormat3.format(new Date()) , Toast.LENGTH_LONG).show();
+                    print(simpleDateFormat3, true);
+                    busStop = false;
+
+                    //overrides Distance Traveled
+
+                }
             }
 
         });
@@ -131,6 +151,27 @@ public class Analysis extends WearableActivity {
         setAmbientEnabled();
         listener2 = new SensorEventListener() {
             public void onSensorChanged(SensorEvent var1) {
+                Sensor sensor = var1.sensor;
+
+                if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                   values[0] = var1.values[0];
+                   values[1] = var1.values[1];
+                   values[2] = var1.values[2];
+                   System.out.println( "TYPE ACCELERMOTETER :" + values[0] +", " +values[1] +"," + values[2] );
+
+                }
+                if (sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+                    values[3] = var1.values[0];
+                    values[4] = var1.values[1];
+                    values[5] = var1.values[2];
+                    System.out.println( "TYPE Linear ACCELERMOTETER :" + values[0] +", " +values[1] +"," + values[2] );
+                }
+                if (sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                   values[6]= var1.values[0];
+                   values[7]= var1.values[1];
+                    values[8] = var1.values[2];
+                }
+
             }
 
             public void onAccuracyChanged(Sensor var1, int var2) {
@@ -157,13 +198,22 @@ public class Analysis extends WearableActivity {
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
                     last = location;
+//                    Toast.makeText(Analysis.this, "Saved your text :"+ latitude+ ": " + longitude, Toast.LENGTH_LONG).show();
                     firstRun = false;
+                    SimpleDateFormat simpleDateFormat3 = new SimpleDateFormat("HH:mm:ss");
+                    print(simpleDateFormat3, false);
                 }
                 else {
                     //  distance = distanceFormula(latitude, location.getLatitude(), longitude, location.getLatitude());
                     distance = location.distanceTo(last);
 
                     if (distanceRange < distance) {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                        last = location;
+//                        Toast.makeText(Analysis.this, "Saved your text :"+ latitude+ ": " + longitude, Toast.LENGTH_LONG).show();
+                        SimpleDateFormat simpleDateFormat3 = new SimpleDateFormat("HH:mm:ss");
+                        print(simpleDateFormat3, false);
 
                     }
                 }
@@ -182,18 +232,26 @@ public class Analysis extends WearableActivity {
             @Override
             public void onProviderDisabled(String s) {
             }
-
-
         };
 
 
-
-
         manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+        mSensorManager.registerListener(listener2, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(listener2, mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(listener2, mSensorManager.getDefaultSensor(TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_UI);
 
     }
+
+
+
+
+    public void print( SimpleDateFormat simpleDateFormat, boolean bus)
+    {
+        output = output +"\n"+ latitude + ", " + longitude + ", " + values[0] +", " + values[1] + ", " + values[2] +", " + values[3] + ", " + values[4] + ", "+ values[5] + ", " + values[6]+
+                ", " + values[7]+ ", " + values[8]+", " +bus + ", " + simpleDateFormat.format(new Date());
+    }
+
+
 //    @Override
 //    protected void onPause()
 //    {
