@@ -119,8 +119,9 @@ public class Analysis extends WearableActivity {
                     writer.flush();
                     writer.close();
                     Toast.makeText(Analysis.this, "Saved your text", Toast.LENGTH_LONG).show();
+                    output = "";
                 } catch (Exception e) { }
-                output = "";
+
 
             }
 
@@ -157,14 +158,14 @@ public class Analysis extends WearableActivity {
                    values[0] = var1.values[0];
                    values[1] = var1.values[1];
                    values[2] = var1.values[2];
-                   System.out.println( "TYPE ACCELERMOTETER :" + values[0] +", " +values[1] +"," + values[2] );
+//                   System.out.println( "TYPE ACCELERMOTETER :" + values[0] +", " +values[1] +"," + values[2] );
 
                 }
                 if (sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
                     values[3] = var1.values[0];
                     values[4] = var1.values[1];
                     values[5] = var1.values[2];
-                    System.out.println( "TYPE Linear ACCELERMOTETER :" + values[0] +", " +values[1] +"," + values[2] );
+//                    System.out.println( "TYPE Linear ACCELERMOTETER :" + values[0] +", " +values[1] +"," + values[2] );
                 }
                 if (sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                    values[6]= var1.values[0];
@@ -249,6 +250,7 @@ public class Analysis extends WearableActivity {
     {
         output = output +"\n"+ latitude + ", " + longitude + ", " + values[0] +", " + values[1] + ", " + values[2] +", " + values[3] + ", " + values[4] + ", "+ values[5] + ", " + values[6]+
                 ", " + values[7]+ ", " + values[8]+", " +bus + ", " + simpleDateFormat.format(new Date());
+//        System.out.println("TEST :" +output);
     }
 
 
